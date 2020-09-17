@@ -46,8 +46,6 @@ const Todos: NextPage<unknown> = (props) => {
     const classes = useStyles();
 
     useEffect(() => {
-        console.log();
-        
         setTodos(props['jsonPayloadTodos']);
     }, [setTodos]);
 
