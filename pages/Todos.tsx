@@ -85,7 +85,7 @@ const Todos: NextPage<unknown> = (props) => {
 
     return (
         <>
-            <PrimarySearchAppBar />
+                                                    <PrimarySearchAppBar />
             <div className={classes.headline}>
                 <Typography variant="h2">Todo App</Typography>
             </div>
