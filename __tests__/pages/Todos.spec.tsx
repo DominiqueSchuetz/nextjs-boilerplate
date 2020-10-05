@@ -2,7 +2,7 @@ import React from 'react';
 
 import { render } from '../../utils/test-utils';
 import { Todos as Todotype } from '../../lib/TodosContext';
-import { fireEvent, RenderResult, cleanup, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
+import { fireEvent, cleanup, waitFor } from '@testing-library/react';
 import Todos from '../../pages/Todos';
 
 const todos: Todotype[] = [
@@ -10,8 +10,6 @@ const todos: Todotype[] = [
     { id: '234', title: 'drink coffee', completed: true },
     { id: '567', title: 'wash dishes', completed: false },
 ];
-
-// afterEach(cleanup);
 
 describe('Testing of Todos Page', () => {
     afterEach(cleanup);

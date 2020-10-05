@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import React, { useState, useEffect, useMemo } from 'react';
-import { NextPage, NextPageContext } from 'next';
+import { NextPage } from 'next';
 import BottomNav from '../components/BottomNav';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import PrimarySearchAppBar from '../components/Navigation-Top';
@@ -21,8 +21,6 @@ type Todos = {
     readonly completed: boolean;
     length?: number;
 };
-
-type Context = NextPageContext;
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -158,16 +156,17 @@ const Todos: NextPage<TodoProps> = ({ todos }) => {
 
 export default Todos;
 
-//eslint-disable-next-line @typescript-eslint/no-unused-vars
-Todos.getInitialProps = async (_ctx: Context): Promise<Todos[] | { message: string }> => {
+export async function getServerSideProps(): Promise<any> {
     try {
         const resTodos = await fetch('https://jsonplaceholder.typicode.com/todos?_limit=5');
         if (!resTodos) return;
 
         const jsonPayloadTodos: Todos[] = (await resTodos.json()) || [];
-        return jsonPayloadTodos as Todos[];
+        return {
+            jsonPayloadTodos,
+        };
     } catch (error) {
         console.error(error);
         return error as { message: string };
     }
-};
+}
