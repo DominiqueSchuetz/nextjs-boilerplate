@@ -7,7 +7,8 @@
         "build": "next build",
         "start": "next start",
         "prettier": "prettier --write \"**/*.{html,js,tsx,ts,md,yml,json,css,scss,less}\"",
-        "lint": "eslint . --ext .json --ext .js --ext .ts --ext .tsx --ext .html"
+        "lint": "eslint . --ext .json --ext .js --ext .ts --ext .tsx --ext .html",
+        "jest": "jest --silent --verbose=true CI=true"
     },
     "husky": {
         "hooks": {
@@ -15,35 +16,46 @@
         }
     },
     "lint-staged": {
-        "*.{html,js,tsx,ts,md,yml,json,css,scss,less}": [
+        "*.{html,js,json,tsx,ts,md,mdx,yml,json,css,scss,less}": [
             "prettier --write",
+            "npm run jest",
             "git add"
         ]
     },
     "dependencies": {
+        "@date-io/moment": "^1.3.13",
         "@material-ui/core": "^4.11.0",
         "@material-ui/icons": "^4.9.1",
+        "@material-ui/lab": "^4.0.0-alpha.56",
+        "@material-ui/pickers": "^3.2.10",
         "@typescript-eslint/eslint-plugin": "^4.1.1",
         "@typescript-eslint/parser": "^4.1.1",
-        "date-fns": "^2.11.1",
+        "date-fns": "^2.0.0-beta.5",
         "dotenv": "^8.2.0",
         "eslint": "^7.9.0",
         "eslint-config-prettier": "^6.11.0",
         "eslint-plugin-prettier": "^3.1.4",
         "eslint-plugin-react": "^7.20.6",
         "gray-matter": "^4.0.2",
+        "moment": "^2.29.0",
         "next": "9.3.5",
         "prettier": "^2.1.1",
         "react": "16.13.1",
         "react-dom": "16.13.1",
+        "react-hook-form": "^6.8.6",
         "remark": "^12.0.0",
         "remark-html": "^11.0.1"
     },
     "devDependencies": {
+        "@testing-library/jest-dom": "^5.11.4",
+        "@testing-library/react": "^11.0.4",
         "@types/node": "^14.10.1",
         "@types/react": "^16.9.49",
+        "babel-jest": "^26.3.0",
         "husky": "^4.3.0",
+        "jest": "^26.4.2",
         "lint-staged": "^10.3.0",
+        "mutationobserver-shim": "^0.3.7",
         "typescript": "^4.0.2"
     }
 }

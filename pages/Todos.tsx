@@ -1,18 +1,25 @@
-import React, { useState, useEffect, createRef } from 'react';
+/* eslint-disable react/prop-types */
+import React, { useState, useEffect, useMemo } from 'react';
 import { NextPage, NextPageContext } from 'next';
+import BottomNav from '../components/BottomNav';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import DoneOutlineIcon from '@material-ui/icons/DoneOutline';
 import PrimarySearchAppBar from '../components/Navigation-Top';
 import Card from '../components/Card';
 import Container from '@material-ui/core/Container';
+import Grid from '@material-ui/core/Grid';
 import TextField from '@material-ui/core/TextField';
 import * as fetch from 'node-fetch';
 import { Typography } from '@material-ui/core';
 
+import { TodosContext, Todos as TodoType } from '../lib/TodosContext';
+import { TodosFilterContext } from '../lib/TodosFilterContext';
+import { FilterBy, Status } from '../types';
+
 type Todos = {
     readonly id: string;
     readonly title: string;
-    readonly completed: string;
+    readonly completed: boolean;
+    length?: number;
 };
 
 type Context = NextPageContext;
@@ -33,26 +40,41 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         complete: {
             display: 'flex',
-
             justifyContent: 'center',
+            alignItems: 'center',
+            height: '40vh',
+        },
+        gridContainer: {
+            paddingLeft: '40px',
+            paddingRight: '40px',
+        },
+        itemContainer: {
+            marginBottom: '5em',
         },
     }),
 );
 
-const Todos: NextPage<unknown> = (props) => {
-    const [todos, setTodos] = useState([]);
-    const [inputValue, setInputValue] = useState('');
+type TodoProps = {
+    readonly todos: TodoType[];
+};
+
+const Todos: NextPage<TodoProps> = ({ todos }) => {
+    // if (Object(props)?.message) {
+    //     console.error('error message', props);
+    // }
+    const [inputValue, setInputValue] = useState<string>('');
+    const [todoList, setTodosList] = useState<TodoType[]>([]);
+
+    const value = useMemo(() => ({ todoList, setTodosList }), [todoList, setTodosList]);
+
+    const [filterValue, setFilterValue] = useState<FilterBy>(FilterBy.all);
+    const filterMemoValue = useMemo(() => ({ filterValue, setFilterValue }), [filterValue, setFilterValue]);
 
     const classes = useStyles();
 
     useEffect(() => {
-        setTodos(props['jsonPayloadTodos']);
-    }, [setTodos]);
-
-    const deleteTodoById = (id: string) => {
-        const filteredArray = todos.filter((todo: Todos) => todo.id !== id);
-        setTodos(filteredArray);
-    };
+        setTodosList(todos || []);
+    }, []);
 
     const handleOnChange = (e: any) => {
         setInputValue(e.target.value);
@@ -60,64 +82,92 @@ const Todos: NextPage<unknown> = (props) => {
 
     const handleSubmit = (e: any) => {
         if (e.key === 'Enter') {
-            setInputValue(e.target.value);
             e.preventDefault();
+            setInputValue(e.target.value);
             setInputValue('');
             addNewTodoItem(inputValue);
         }
     };
 
     const addNewTodoItem = (value: string) => {
+        if (value.length < 2) return;
         const addedTodoItem = {
-            id: todos.length + 10,
-            title: value,
+            id: new Date().toISOString(),
+            title: value.toLocaleLowerCase().trim(),
+            status: Status[1],
             completed: false,
         };
-        setTodos([...todos, addedTodoItem]);
+        setTodosList([addedTodoItem, ...todoList]);
     };
 
     const allComplete = (
         <Container className={classes.complete}>
             <Typography variant="h2">Hey, everything is done!</Typography>
-            <DoneOutlineIcon style={{ color: 'green' }} />
         </Container>
     );
 
+    const CardItem = (todo: Todos) => (
+        <Grid className={classes.itemContainer} key={todo.id} item xs={12} sm={6} md={4}>
+            <Card key={todo.id} todo={todo} />
+        </Grid>
+    );
+
+    const renderListByFilter = (filterValue: FilterBy) => {
+        if (filterValue === FilterBy.open) {
+            return todoList.filter((todo: Todos) => !todo.completed).map((todo: Todos) => CardItem(todo));
+        } else if (filterValue === FilterBy.done) {
+            return todoList.filter((todo: Todos) => todo.completed).map((todo: Todos) => CardItem(todo));
+        } else {
+            return todoList.map((todo: Todos) => CardItem(todo));
+        }
+    };
+
     return (
         <>
-            <PrimarySearchAppBar />
-            <div className={classes.headline}>
-                <Typography variant="h2">Todo App</Typography>
-            </div>
-            <Container maxWidth="xl">
-                <form className={classes.root} noValidate autoComplete="off">
-                    <TextField
-                        id="outlined-basic"
-                        label="What else to do?"
-                        variant="outlined"
-                        color="primary"
-                        onChange={handleOnChange}
-                        value={inputValue}
-                        onKeyPress={handleSubmit}
-                    />
-                </form>
-                <>
-                    {(todos.length && todos.map((todo) => <Card key={todo.id} todo={todo} done={deleteTodoById} />)) ||
-                        allComplete}
-                </>
-            </Container>
+            <TodosContext.Provider value={value}>
+                <TodosFilterContext.Provider value={filterMemoValue}>
+                    <PrimarySearchAppBar />
+                    <div className={classes.headline}>
+                        <Typography variant="h2">Todo App</Typography>
+                    </div>
+                    <Container maxWidth="xl">
+                        <form className={classes.root} noValidate autoComplete="off">
+                            <TextField
+                                inputProps={{ 'data-testid': 'inputfield' }}
+                                id="outlined-basic"
+                                label="What else to do?"
+                                variant="outlined"
+                                color="primary"
+                                onChange={handleOnChange}
+                                value={inputValue}
+                                onKeyPress={handleSubmit}
+                            />
+                        </form>
+                        <>
+                            <Grid className={classes.gridContainer} container spacing={4} justify="center">
+                                {(todoList?.length && renderListByFilter(filterValue)) || allComplete}
+                            </Grid>
+                        </>
+                    </Container>
+                    <BottomNav />
+                </TodosFilterContext.Provider>
+            </TodosContext.Provider>
         </>
     );
 };
 
 export default Todos;
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-Todos.getInitialProps = async (_ctx: Context) => {
-    const resTodos = await fetch('https://jsonplaceholder.typicode.com/todos?_limit=5');
-    const jsonPayloadTodos: Todos[] = await resTodos.json();
+//eslint-disable-next-line @typescript-eslint/no-unused-vars
+Todos.getInitialProps = async (_ctx: Context): Promise<Todos[] | { message: string }> => {
+    try {
+        const resTodos = await fetch('https://jsonplaceholder.typicode.com/todos?_limit=5');
+        if (!resTodos) return;
 
-    return {
-        jsonPayloadTodos,
-    };
+        const jsonPayloadTodos: Todos[] = (await resTodos.json()) || [];
+        return jsonPayloadTodos as Todos[];
+    } catch (error) {
+        console.error(error);
+        return error as { message: string };
+    }
 };

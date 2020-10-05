@@ -1,4 +1,5 @@
 import React, { useContext } from 'react';
+import Link from 'next/link';
 import { fade, makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -18,6 +19,7 @@ import MoreIcon from '@material-ui/icons/MoreVert';
 import Brightness4Icon from '@material-ui/icons/Brightness4';
 
 import { ToogleThemeContext } from '../lib/ToogleThemeContext';
+import { useRouter } from 'next/dist/client/router';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -75,6 +77,7 @@ const useStyles = makeStyles((theme: Theme) =>
             [theme.breakpoints.up('md')]: {
                 display: 'flex',
             },
+            alignItems: 'center',
         },
         sectionMobile: {
             display: 'flex',
@@ -90,6 +93,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export default function PrimarySearchAppBar(): JSX.Element {
     const { themeState, setThemeState } = useContext(ToogleThemeContext);
+    const router = useRouter();
 
     const classes = useStyles();
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -143,15 +147,15 @@ export default function PrimarySearchAppBar(): JSX.Element {
             onClose={handleMobileMenuClose}
         >
             <MenuItem>
-                <IconButton aria-label="toogle dark mode" color="inherit">
-                    {/* <Typography style={{ marginRight: '0.5rem' }}>Dark</Typography> */}
+                <Switch style={{ color: 'pink' }} checked={themeState} onChange={() => setThemeState(!themeState)} />
+                {/* <IconButton aria-label="toogle dark mode" color="inherit">
                     <Brightness4Icon />
                     <Switch
                         style={{ color: 'pink' }}
                         checked={themeState}
                         onChange={() => setThemeState(!themeState)}
                     />
-                </IconButton>
+                </IconButton> */}
             </MenuItem>
             <MenuItem>
                 <IconButton aria-label="show 4 new mails" color="inherit">
@@ -208,15 +212,20 @@ export default function PrimarySearchAppBar(): JSX.Element {
                     </div>
                     <div className={classes.grow} />
                     <div className={classes.sectionDesktop}>
-                        <IconButton aria-label="toogle dark mode" color="inherit">
-                            {/* <Typography style={{ marginRight: '0.5rem' }}>Dark</Typography> */}
+                        <Brightness4Icon />
+                        <Switch
+                            style={{ color: 'pink' }}
+                            checked={themeState}
+                            onChange={() => setThemeState(!themeState)}
+                        />
+                        {/* <IconButton aria-label="toogle dark mode" color="inherit">
                             <Brightness4Icon />
                             <Switch
                                 style={{ color: 'pink' }}
                                 checked={themeState}
                                 onChange={() => setThemeState(!themeState)}
                             />
-                        </IconButton>
+                        </IconButton> */}
                         <IconButton aria-label="show 4 new mails" color="inherit">
                             <Badge badgeContent={66} color="secondary">
                                 <MailIcon />
@@ -230,9 +239,8 @@ export default function PrimarySearchAppBar(): JSX.Element {
                         <IconButton
                             edge="end"
                             aria-label="account of current user"
-                            aria-controls={menuId}
-                            aria-haspopup="true"
-                            onClick={handleProfileMenuOpen}
+                            aria-haspopup="false"
+                            onClick={() => router.push('/signin')}
                             color="inherit"
                         >
                             <AccountCircle />
