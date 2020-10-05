@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { render } from '../test-utils';
+import { render } from '../../utils/test-utils';
 import { Todos as Todotype } from '../../lib/TodosContext';
 import { fireEvent, RenderResult, cleanup, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
 import Todos from '../../pages/Todos';

@@ -8,7 +8,8 @@
         "start": "next start",
         "prettier": "prettier --write \"**/*.{html,js,tsx,ts,md,yml,json,css,scss,less}\"",
         "lint": "eslint . --ext .json --ext .js --ext .ts --ext .tsx --ext .html",
-        "jest": "jest --silent --verbose=true CI=true"
+        "jest": "jest --silent --verbose=true --watch",
+        "jest:CI": "jest --silent --verbose=true CI=true"
     },
     "husky": {
         "hooks": {
@@ -18,7 +19,7 @@
     "lint-staged": {
         "*.{html,js,json,tsx,ts,md,mdx,yml,json,css,scss,less}": [
             "prettier --write",
-            "npm run jest",
+            "npm run jest:CI",
             "git add"
         ]
     },

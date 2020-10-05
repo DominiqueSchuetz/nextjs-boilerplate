@@ -2,7 +2,7 @@ import React from 'react';
 import { Todos } from '../../lib/TodosContext';
 import { Status } from '../../types';
 
-import { render } from '../test-utils';
+import { render } from '../../utils/test-utils';
 import Card from '../../components/Card';
 
 describe('Card', () => {
