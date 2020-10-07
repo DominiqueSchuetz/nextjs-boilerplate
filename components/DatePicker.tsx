@@ -5,11 +5,12 @@ import MomentUtils from '@date-io/moment';
 
 import { MuiPickersUtilsProvider, KeyboardTimePicker, KeyboardDatePicker } from '@material-ui/pickers';
 import { makeStyles, Theme, createStyles } from '@material-ui/core';
+import { Moment } from 'moment';
 
 export default function MaterialUIPickers() {
-    const [selectedDate, setSelectedDate] = React.useState<Date | null>(new Date());
+    const [selectedDate, setSelectedDate] = React.useState<Date | Moment>(new Date());
 
-    const handleDateChange = (date: Date | null) => {
+    const handleDateChange = (date: moment.Moment, value?: string) => {
         setSelectedDate(date);
     };
 

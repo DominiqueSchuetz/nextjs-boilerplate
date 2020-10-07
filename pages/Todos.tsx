@@ -156,17 +156,17 @@ const Todos: NextPage<TodoProps> = ({ todos }) => {
 
 export default Todos;
 
-export async function getServerSideProps(): Promise<any> {
-    try {
-        const resTodos = await fetch('https://jsonplaceholder.typicode.com/todos?_limit=5');
-        if (!resTodos) return;
+// export async function getServerSideProps(): Promise<any> {
+//     try {
+//         const resTodos = await fetch('https://jsonplaceholder.typicode.com/todos?_limit=5');
+//         if (!resTodos) return;
 
-        const jsonPayloadTodos: Todos[] = (await resTodos.json()) || [];
-        return {
-            jsonPayloadTodos,
-        };
-    } catch (error) {
-        console.error(error);
-        return error as { message: string };
-    }
-}
+//         const jsonPayloadTodos: Todos[] = (await resTodos.json()) || [];
+//         return {
+//             jsonPayloadTodos,
+//         };
+//     } catch (error) {
+//         console.error(error);
+//         return error as { message: string };
+//     }
+// }
