@@ -11,7 +11,7 @@
         "start": "next start",
         "prettier": "prettier --write \"**/*.{html,js,tsx,ts,md,yml,json,css,scss,less}\"",
         "lint": "eslint . --ext .json --ext .js --ext .ts --ext .tsx --ext .html",
-        "jest": " npx jest --all --silent --verbose=true --watch --coverage --bail",
+        "jest": " npx jest --all --findRelatedTests ./__tests__/**/*.tsx --silent --verbose=true --watch --coverage --bail",
         "jest:CI": "npx jest --all --findRelatedTests ./__tests__/**/*.tsx --silent --verbose=true --coverage --bail",
         "cypress": "npx cypress open"
     },
