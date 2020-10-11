@@ -3,7 +3,7 @@ import React from 'react';
 import { render } from '../../utils/test-utils';
 import { Todos as Todotype } from '../../lib/TodosContext';
 import { fireEvent, cleanup, waitFor } from '@testing-library/react';
-import Todos from '../../pages/Todos';
+import Todos from '../../pages/todos';
 
 const todos: Todotype[] = [
     { id: '123', title: 'buy milk', completed: false },
