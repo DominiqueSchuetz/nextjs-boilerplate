@@ -10,6 +10,7 @@ import Grid from '@material-ui/core/Grid';
 import TextField from '@material-ui/core/TextField';
 import * as fetch from 'node-fetch';
 import { Typography } from '@material-ui/core';
+import { withFirebaseAuthentication } from '../utils/withFirebaseAuthentication';
 
 import { TodosContext, Todos as TodoType } from '../lib/TodosContext';
 import { TodosFilterContext } from '../lib/TodosFilterContext';
@@ -56,10 +57,7 @@ type TodoProps = {
     readonly todos: TodoType[];
 };
 
-const Todos: NextPage<TodoProps> = ({ todos }) => {
-    // if (Object(props)?.message) {
-    //     console.error('error message', props);
-    // }
+const Todos: NextPage<TodoProps | any> = ({ todos }) => {
     const [inputValue, setInputValue] = useState<string>('');
     const [todoList, setTodosList] = useState<TodoType[]>([]);
 
@@ -154,7 +152,7 @@ const Todos: NextPage<TodoProps> = ({ todos }) => {
     );
 };
 
-export default Todos;
+export default withFirebaseAuthentication(Todos);
 
 // export async function getServerSideProps(): Promise<any> {
 //     try {

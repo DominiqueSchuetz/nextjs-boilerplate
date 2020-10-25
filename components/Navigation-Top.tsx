@@ -1,5 +1,4 @@
 import React, { useContext } from 'react';
-import Link from 'next/link';
 import { fade, makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -20,6 +19,8 @@ import Brightness4Icon from '@material-ui/icons/Brightness4';
 
 import { ToogleThemeContext } from '../lib/ToogleThemeContext';
 import { useRouter } from 'next/dist/client/router';
+import { useAuth } from '../firebase/auth-service';
+import { toast } from 'react-toastify';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -94,6 +95,7 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function PrimarySearchAppBar(): JSX.Element {
     const { themeState, setThemeState } = useContext(ToogleThemeContext);
     const router = useRouter();
+    const { signout, userId } = useAuth();
 
     const classes = useStyles();
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -115,6 +117,25 @@ export default function PrimarySearchAppBar(): JSX.Element {
         handleMobileMenuClose();
     };
 
+    const handleSignOutAndMenuClose = () => {
+        setAnchorEl(null);
+        signout();
+        toast.success('Du bist erfolgreich ausgeloggt');
+        router.push('/signin');
+
+        handleMobileMenuClose();
+    };
+    const handleSignInAndMenuClose = () => {
+        setAnchorEl(null);
+        router.push('/signin');
+        handleMobileMenuClose();
+    };
+    const handleSignUpAndMenuClose = () => {
+        setAnchorEl(null);
+        router.push('/signup');
+        handleMobileMenuClose();
+    };
+
     const handleMobileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
         setMobileMoreAnchorEl(event.currentTarget);
     };
@@ -130,8 +151,10 @@ export default function PrimarySearchAppBar(): JSX.Element {
             open={isMenuOpen}
             onClose={handleMenuClose}
         >
-            <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-            <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+            {!userId && <MenuItem onClick={handleSignInAndMenuClose}>Sign In</MenuItem>}
+            {userId && <MenuItem onClick={handleSignOutAndMenuClose}>Sign Out</MenuItem>}
+            <MenuItem onClick={handleSignUpAndMenuClose}>Sign Up</MenuItem>
+            {userId && <MenuItem onClick={handleMenuClose}>My account</MenuItem>}
         </Menu>
     );
 
@@ -148,14 +171,6 @@ export default function PrimarySearchAppBar(): JSX.Element {
         >
             <MenuItem>
                 <Switch style={{ color: 'pink' }} checked={themeState} onChange={() => setThemeState(!themeState)} />
-                {/* <IconButton aria-label="toogle dark mode" color="inherit">
-                    <Brightness4Icon />
-                    <Switch
-                        style={{ color: 'pink' }}
-                        checked={themeState}
-                        onChange={() => setThemeState(!themeState)}
-                    />
-                </IconButton> */}
             </MenuItem>
             <MenuItem>
                 <IconButton aria-label="show 4 new mails" color="inherit">
@@ -218,14 +233,6 @@ export default function PrimarySearchAppBar(): JSX.Element {
                             checked={themeState}
                             onChange={() => setThemeState(!themeState)}
                         />
-                        {/* <IconButton aria-label="toogle dark mode" color="inherit">
-                            <Brightness4Icon />
-                            <Switch
-                                style={{ color: 'pink' }}
-                                checked={themeState}
-                                onChange={() => setThemeState(!themeState)}
-                            />
-                        </IconButton> */}
                         <IconButton aria-label="show 4 new mails" color="inherit">
                             <Badge badgeContent={66} color="secondary">
                                 <MailIcon />
@@ -240,7 +247,8 @@ export default function PrimarySearchAppBar(): JSX.Element {
                             edge="end"
                             aria-label="account of current user"
                             aria-haspopup="false"
-                            onClick={() => router.push('/signin')}
+                            // onClick={() => router.push('/signin')}
+                            onClick={handleProfileMenuOpen}
                             color="inherit"
                         >
                             <AccountCircle />

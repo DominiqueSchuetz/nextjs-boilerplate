@@ -13,10 +13,12 @@ import Grid from '@material-ui/core/Grid';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
+import { useRouter } from 'next/router';
 
-import { errorMessages, validations, loginUser } from '../utils';
+import { errorMessages, validations } from '../utils';
+import { useAuth } from '../firebase/auth-service';
 import { initialState, loginReducer } from '../store/loginReducer';
-import { ERROR_ACTION, SUCCESS_ACTION, LOGIN_ACTION, LOGOUT_ACTION } from '../store/action.types';
+import { ERROR_ACTION, SUCCESS_ACTION, LOGIN_ACTION, LOGOUT_ACTION, SIGN_IN_MESSAGES } from '../store/action.types';
 
 function Copyright() {
     return (
@@ -60,6 +62,8 @@ const useStyles = makeStyles((theme) => ({
 
 const SignInSide = (): JSX.Element => {
     const classes = useStyles();
+    const { signin } = useAuth();
+    const router = useRouter();
     const { register, handleSubmit, errors } = useForm();
 
     const [state, dispatch] = useReducer(loginReducer, initialState);
@@ -68,8 +72,20 @@ const SignInSide = (): JSX.Element => {
     const onSubmit = async (userFormData: { email: string; password: string }) => {
         dispatch({ type: LOGIN_ACTION });
         try {
-            await loginUser(userFormData);
-            dispatch({ type: SUCCESS_ACTION });
+            const response: firebase.User | firebase.FirebaseError = await signin(
+                userFormData.email,
+                userFormData.password,
+            );
+
+            if (response instanceof Error) {
+                dispatch({ type: ERROR_ACTION, message: ((response as unknown) as firebase.FirebaseError).message });
+                return;
+            }
+            router.push('/todos');
+            dispatch({
+                type: SUCCESS_ACTION,
+                message: SIGN_IN_MESSAGES.SUCCESS,
+            });
         } catch (error) {
             dispatch({ type: ERROR_ACTION });
         }
@@ -104,7 +120,7 @@ const SignInSide = (): JSX.Element => {
                         <form className={classes.form} noValidate onSubmit={handleSubmit(onSubmit)}>
                             {error && <p className="error">{error}</p>}
                             <TextField
-                                data-testid="email"
+                                data-testid="Email Address"
                                 inputRef={register({
                                     required: true,
                                     minLength: 6,
@@ -124,7 +140,7 @@ const SignInSide = (): JSX.Element => {
                                 helperText={errorMessages.email[errors.email?.type]}
                             />
                             <TextField
-                                data-testid="password"
+                                data-testid="Password"
                                 inputRef={register({ required: true, minLength: 8, maxLength: 15 })}
                                 variant="outlined"
                                 margin="normal"
@@ -143,6 +159,7 @@ const SignInSide = (): JSX.Element => {
                                 label="Remember me"
                             />
                             <Button
+                                data-testid="button"
                                 disabled={errors.email !== undefined || errors.password !== undefined || isLoading}
                                 type="submit"
                                 fullWidth
@@ -154,13 +171,13 @@ const SignInSide = (): JSX.Element => {
                             </Button>
                             <Grid container>
                                 <Grid item xs>
-                                    <Link href="/todos    " as={`/todos`}>
+                                    <Link href="/todos" as={`/todos`}>
                                         <a>Go back to Todos</a>
                                     </Link>
                                 </Grid>
                                 <Grid item>
                                     <Link href="/signup" as={`/signup`}>
-                                        <a>Don't have an account? Sign Up</a>
+                                        <a>Dont have an account?</a>
                                     </Link>
                                 </Grid>
                             </Grid>

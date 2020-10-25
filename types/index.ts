@@ -40,5 +40,5 @@ export type EmailFormTyes = {
     password: string;
     isLoading: boolean;
     error: string;
-    isLoggedIn: boolean;
+    isLoggedIn?: boolean;
 };

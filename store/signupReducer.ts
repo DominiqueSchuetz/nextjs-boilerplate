@@ -1,10 +1,10 @@
 import { EmailFormTyes } from '../types';
-import { LOGIN_ACTION, SUCCESS_ACTION, ERROR_ACTION, LOGOUT_ACTION } from '../store/action.types';
+import { SIGNUP_ACTION, SUCCESS_ACTION, ERROR_ACTION } from '../store/action.types';
 import { toast } from 'react-toastify';
 
-export const loginReducer = (state: EmailFormTyes, action: { type: string; message?: string }): EmailFormTyes => {
+export const signupReducer = (state: EmailFormTyes, action: { type: string; message?: string }): EmailFormTyes => {
     switch (action.type) {
-        case LOGIN_ACTION: {
+        case SIGNUP_ACTION: {
             return {
                 ...state,
                 isLoading: true,
@@ -17,14 +17,6 @@ export const loginReducer = (state: EmailFormTyes, action: { type: string; messa
                 ...state,
                 isLoading: false,
                 isLoggedIn: true,
-                error: '',
-            };
-        }
-        case LOGOUT_ACTION: {
-            return {
-                ...state,
-                isLoading: false,
-                isLoggedIn: false,
                 error: '',
             };
         }
@@ -48,5 +40,4 @@ export const initialState: EmailFormTyes = {
     password: '',
     isLoading: false,
     error: '',
-    isLoggedIn: false,
 };

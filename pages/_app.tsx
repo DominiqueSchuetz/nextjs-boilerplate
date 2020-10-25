@@ -5,6 +5,9 @@ import { ThemeProvider } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { darkTheme, lightTheme } from '../styles/theme';
 import { ToogleThemeContext } from '../lib/ToogleThemeContext';
+import { ProvideAuth } from '../firebase/auth-service';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function App({ Component, pageProps }: AppProps): JSX.Element {
     const [themeState, setThemeState] = useState<boolean>(false);
@@ -24,13 +27,16 @@ export default function App({ Component, pageProps }: AppProps): JSX.Element {
                 <title>My page</title>
                 <meta name="viewport" content="minimum-scale=1, initial-scale=1, width=device-width" />
             </Head>
-            <ToogleThemeContext.Provider value={value}>
-                <ThemeProvider theme={themeState ? darkTheme : lightTheme}>
-                    {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-                    <CssBaseline />
-                    <Component {...pageProps} />
-                </ThemeProvider>
-            </ToogleThemeContext.Provider>
+            <ProvideAuth>
+                <ToastContainer autoClose={7000} />
+                <ToogleThemeContext.Provider value={value}>
+                    <ThemeProvider theme={themeState ? darkTheme : lightTheme}>
+                        {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+                        <CssBaseline />
+                        <Component {...pageProps} />
+                    </ThemeProvider>
+                </ToogleThemeContext.Provider>
+            </ProvideAuth>
         </>
     );
 }

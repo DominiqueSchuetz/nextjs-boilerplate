@@ -13,7 +13,8 @@
         "lint": "eslint . --ext .json --ext .js --ext .ts --ext .tsx --ext .html",
         "jest": " npx jest --all --findRelatedTests ./__tests__/**/*.tsx --silent --verbose=true --watch --coverage --bail",
         "jest:CI": "npx jest --all --findRelatedTests ./__tests__/**/*.tsx --silent --verbose=true --coverage --bail",
-        "cypress": "npx cypress open"
+        "cypress": "npx cypress open",
+        "cypress:headless": "npx cypress run --spec \"cypress/integration/features/**/*.feature\""
     },
     "husky": {
         "hooks": {
@@ -23,8 +24,7 @@
     "lint-staged": {
         "*.{html,js,json,tsx,ts,md,mdx,yml,json,css,scss,less}": [
             "prettier --write",
-            "npm run jest:CI",
-            "git add"
+            "npm run jest:CI"
         ]
     },
     "dependencies": {
@@ -41,25 +41,30 @@
         "eslint-config-prettier": "^6.11.0",
         "eslint-plugin-prettier": "^3.1.4",
         "eslint-plugin-react": "^7.20.6",
+        "firebase": "^7.23.0",
         "gray-matter": "^4.0.2",
         "moment": "^2.29.0",
         "next": "9.3.5",
         "prettier": "^2.1.1",
+        "query-string": "^6.13.5",
         "react": "16.13.1",
         "react-dom": "16.13.1",
         "react-hook-form": "^6.8.6",
+        "react-toastify": "^6.0.9",
         "remark": "^12.0.0",
         "remark-html": "^11.0.1"
     },
     "devDependencies": {
         "@testing-library/jest-dom": "^5.11.4",
         "@testing-library/react": "^11.0.4",
+        "@types/firebase": "^3.2.1",
         "@types/jest": "^26.0.14",
         "@types/node": "^14.10.1",
         "@types/react": "^16.9.49",
         "babel-jest": "^26.3.0",
-        "cypress": "^5.3.0",
+        "cypress": "^5.4.0",
         "cypress-cucumber-preprocessor": "^3.0.0",
+        "cypress-plugin-tab": "^1.0.5",
         "husky": "^4.3.0",
         "jest": "^26.4.2",
         "lint-staged": "^10.3.0",
