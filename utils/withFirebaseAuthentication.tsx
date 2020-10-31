@@ -8,12 +8,12 @@ export function withFirebaseAuthentication<P>(Component: React.ComponentType<P>)
         const router = useRouter();
 
         useEffect(() => {
-            if (!userId) {
-                router.push('/signin');
+            if (!userId && router) {
+                router.push({ pathname: '/signin' });
             }
-        }, []);
+        }, [userId, router]);
 
-        return <>{!!userId && <Component {...props} />}</>;
+        return <>{<Component {...props} />}</>;
     };
 
     return WrappedComponent;

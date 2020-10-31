@@ -1,10 +1,12 @@
 import React from 'react';
 
 import { render } from '../../utils/test-utils';
-import { ProvideAuth } from '../../firebase/auth-service';
 import { Todos as Todotype } from '../../lib/TodosContext';
-import { fireEvent, cleanup, waitFor } from '@testing-library/react';
+import { fireEvent, cleanup, screen, waitFor } from '@testing-library/react';
+import { useAuth } from '../../firebase/auth-service';
+
 import Todos from '../../pages/todos';
+import * as firebase from 'firebase/app';
 
 const todos: Todotype[] = [
     { id: '123', title: 'buy milk', completed: false },
@@ -12,104 +14,150 @@ const todos: Todotype[] = [
     { id: '567', title: 'wash dishes', completed: false },
 ];
 
-describe('Testing of Todos Page', () => {
-    afterEach(cleanup);
+//jest.mock('../../firebase/auth-service')
 
-    //const mock = jest.mock('../../firebase/auth-service.tsx', () => {});
+jest.mock('firebase/app', () => {
+    const user = {
+        email: 'test@test.de',
+        uid: '123456789',
+        emailVerified: true,
+    };
+    const data = { name: 'unnamed' };
+    const snapshot = { val: () => data };
+    return {
+        initializeApp: jest.fn().mockReturnValue({
+            database: jest.fn().mockReturnValue({
+                ref: jest.fn().mockReturnThis(),
+                once: jest.fn(() => Promise.resolve(snapshot)),
+            }),
+        }),
+        apps: [],
+        auth: jest.fn().mockReturnValue({
+            currentUser: user,
+            signOut() {
+                return Promise.resolve();
+            },
+            signInWithEmailAndPassword(email, password) {
+                return new Promise((resolve, reject) => {
+                    if (password === 'sign' || password === 'key') {
+                        resolve({ name: 'user' });
+                    }
+                    reject(Error('sign in error '));
+                });
+            },
+            createUserWithEmailAndPassword(email, password) {
+                return new Promise((resolve, reject) => {
+                    if (password === 'create' || password === 'key') {
+                        resolve({ name: 'createUser' });
+                    }
+                    reject(Error('create user error '));
+                });
+            },
+            onAuthStateChanged: jest.fn().mockReturnValue(user),
+        }),
+    };
+});
+
+describe('Testing of Todos Page', () => {
+    afterEach(() => {
+        cleanup();
+        jest.restoreAllMocks();
+    });
 
     test('should have text todo app', async () => {
-        // console.log(mock);
+        const { getByText, findByText, debug } = render(<Todos todos={todos} />, {});
 
-        const { getByText, findByText } = render(
-            <ProvideAuth>
-                <Todos todos={todos} />
-            </ProvideAuth>,
+        expect(firebase.initializeApp).toHaveBeenCalledTimes(1);
+        expect(firebase.auth).toHaveBeenCalledTimes(1);
+        expect(firebase.auth().currentUser).toStrictEqual({
+            email: 'test@test.de',
+            uid: '123456789',
+            emailVerified: true,
+        });
 
-            {},
-        );
         expect(getByText('Todo App')).not.toBeNull();
         await findByText('wash dishes');
     });
 
-    // test('should have an input filed with label text', () => {
-    //     const { getByLabelText } = render(<Todos todos={todos}></Todos>, {});
-    //     getByLabelText('What else to do?');
-    // });
+    test('should have an input filed with label text', () => {
+        const { getByLabelText } = render(<Todos todos={todos}></Todos>, {});
+        getByLabelText('What else to do?');
+    });
 
-    // test('should add a new todo card', async () => {
-    //     const { findByTestId, getByText } = render(<Todos todos={todos}></Todos>, {});
-    //     const inputField = await findByTestId('inputfield');
+    test('should add a new todo card', async () => {
+        const { findByTestId, getByText } = render(<Todos todos={todos}></Todos>, {});
+        const inputField = await findByTestId('inputfield');
 
-    //     fireEvent.change(inputField, { target: { value: 'A new todo' } });
-    //     fireEvent.keyPress(inputField, { key: 'Enter', keyCode: 13 });
+        fireEvent.change(inputField, { target: { value: 'A new todo' } });
+        fireEvent.keyPress(inputField, { key: 'Enter', keyCode: 13 });
 
-    //     await waitFor(() => {
-    //         getByText(/a nEw todo/i);
-    //     });
-    // });
+        await waitFor(() => {
+            getByText(/a nEw todo/i);
+        });
+    });
 
-    // test('should delete a todo card', () => {
-    //     const { getAllByText, getByText, queryByText } = render(<Todos todos={todos}></Todos>, {});
-    //     expect(getByText('buy milk')).not.toBeNull();
-    //     const deleteButton = getAllByText('Delete')[0];
-    //     fireEvent.click(deleteButton);
+    test('should delete a todo card', () => {
+        const { getAllByText, getByText, queryByText } = render(<Todos todos={todos}></Todos>, {});
+        expect(getByText('buy milk')).not.toBeNull();
+        const deleteButton = getAllByText('Delete')[0];
+        fireEvent.click(deleteButton);
 
-    //     expect(queryByText('buy milk')).toBeNull();
-    // });
+        expect(queryByText('buy milk')).toBeNull();
+    });
 
-    // xtest('should complete a todo card', () => {
-    //     const { getAllByText, getAllByTestId } = render(<Todos todos={todos}></Todos>, {});
-    //     const allTodos = getAllByTestId('todo-status');
-    //     let openTodos = allTodos.filter((e) => e.textContent === 'Open');
+    xtest('should complete a todo card', () => {
+        const { getAllByText, getAllByTestId } = render(<Todos todos={todos}></Todos>, {});
+        const allTodos = getAllByTestId('todo-status');
+        let openTodos = allTodos.filter((e) => e.textContent === 'Open');
 
-    //     expect(getAllByText('Revert').length).toBe(1);
-    //     expect(openTodos.length).toBe(2);
+        expect(getAllByText('Revert').length).toBe(1);
+        expect(openTodos.length).toBe(2);
 
-    //     const doneButton = getAllByText('Done')[0];
-    //     fireEvent.click(doneButton);
+        const doneButton = getAllByText('Done')[0];
+        fireEvent.click(doneButton);
 
-    //     openTodos = allTodos.filter((e) => e.textContent === 'Open');
-    //     expect(openTodos.length).toBe(1);
+        openTodos = allTodos.filter((e) => e.textContent === 'Open');
+        expect(openTodos.length).toBe(1);
 
-    //     expect(getAllByText('Revert').length).toBe(2);
-    // });
+        expect(getAllByText('Revert').length).toBe(2);
+    });
 
-    // test('should filter completed todos', async () => {
-    //     const { getAllByTestId, getByTestId } = render(<Todos todos={todos}></Todos>, {});
+    test('should filter completed todos', async () => {
+        const { getAllByTestId, getByTestId } = render(<Todos todos={todos}></Todos>, {});
 
-    //     expect(getAllByTestId('todo-card').length).toBe(3);
-    //     const filterButton = getByTestId('filter-button-completed');
+        expect(getAllByTestId('todo-card').length).toBe(3);
+        const filterButton = getByTestId('filter-button-completed');
 
-    //     fireEvent.click(filterButton);
+        fireEvent.click(filterButton);
 
-    //     const findCompleted = getAllByTestId('todo-card');
-    //     expect(findCompleted.length).toBe(1);
-    // });
+        const findCompleted = getAllByTestId('todo-card');
+        expect(findCompleted.length).toBe(1);
+    });
 
-    // test('should filter open todos', async () => {
-    //     const { getAllByTestId, getByTestId } = render(<Todos todos={todos}></Todos>, {});
-    //     expect(getAllByTestId('todo-card').length).toBe(3);
-    //     const filterButton = getByTestId('filter-button-open');
-    //     fireEvent.click(filterButton);
+    test('should filter open todos', async () => {
+        const { getAllByTestId, getByTestId } = render(<Todos todos={todos}></Todos>, {});
+        expect(getAllByTestId('todo-card').length).toBe(3);
+        const filterButton = getByTestId('filter-button-open');
+        fireEvent.click(filterButton);
 
-    //     expect(getAllByTestId('todo-card').length).toBe(2);
-    // });
+        expect(getAllByTestId('todo-card').length).toBe(2);
+    });
 
-    // test('should filter all todos', () => {
-    //     const { getAllByTestId, getByTestId } = render(<Todos todos={todos}></Todos>, {});
-    //     expect(getAllByTestId('todo-card').length).toBe(3);
-    //     const filterButton = getByTestId('filter-button-all');
-    //     fireEvent.click(filterButton);
+    test('should filter all todos', () => {
+        const { getAllByTestId, getByTestId } = render(<Todos todos={todos}></Todos>, {});
+        expect(getAllByTestId('todo-card').length).toBe(3);
+        const filterButton = getByTestId('filter-button-all');
+        fireEvent.click(filterButton);
 
-    //     expect(getAllByTestId('todo-card').length).toBe(3);
-    // });
+        expect(getAllByTestId('todo-card').length).toBe(3);
+    });
 
-    // test('should delete all todos', () => {
-    //     const { getAllByTestId, getByTestId, queryAllByTestId } = render(<Todos todos={todos}></Todos>, {});
-    //     expect(getAllByTestId('todo-card').length).toBe(3);
-    //     const filterButton = getByTestId('filter-button-delete-all');
-    //     fireEvent.click(filterButton);
+    test('should delete all todos', () => {
+        const { getAllByTestId, getByTestId, queryAllByTestId } = render(<Todos todos={todos}></Todos>, {});
+        expect(getAllByTestId('todo-card').length).toBe(3);
+        const filterButton = getByTestId('filter-button-delete-all');
+        fireEvent.click(filterButton);
 
-    //     expect(queryAllByTestId('todo-card').length).toBe(0);
-    // });
+        expect(queryAllByTestId('todo-card').length).toBe(0);
+    });
 });

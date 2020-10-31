@@ -42,3 +42,14 @@ export type EmailFormTyes = {
     error: string;
     isLoggedIn?: boolean;
 };
+
+export type AuthType = {
+    userId: string;
+    user: firebase.User;
+    signin: (email: string, password: string) => Promise<firebase.User | firebase.FirebaseError>;
+    signup: (email: string, password: string) => Promise<firebase.User | firebase.FirebaseError>;
+    signout: () => Promise<void | firebase.FirebaseError>;
+    sendPasswordResetEmail: (email: string) => Promise<boolean>;
+    confirmPasswordReset: (password: string, code: string) => Promise<boolean>;
+    deleteUser: () => Promise<void>;
+};

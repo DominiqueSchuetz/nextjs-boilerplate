@@ -9,7 +9,7 @@
         "dev": "next dev",
         "build": "next build",
         "start": "next start",
-        "prettier": "prettier --write \"**/*.{html,js,tsx,ts,md,yml,json,css,scss,less}\"",
+        "prettier": "prettier --write \"**/*.{html,js,tsx,ts,md,yml,json,css,scss,less,feature}\"",
         "lint": "eslint . --ext .json --ext .js --ext .ts --ext .tsx --ext .html",
         "jest": " npx jest --all --findRelatedTests ./__tests__/**/*.tsx --silent --verbose=true --watch --coverage --bail",
         "jest:CI": "npx jest --all --findRelatedTests ./__tests__/**/*.tsx --silent --verbose=true --coverage --bail",
@@ -22,7 +22,7 @@
         }
     },
     "lint-staged": {
-        "*.{html,js,json,tsx,ts,md,mdx,yml,json,css,scss,less}": [
+        "*.{html,js,json,tsx,ts,md,mdx,yml,json,css,scss,less,feature}": [
             "prettier --write",
             "npm run jest:CI"
         ]

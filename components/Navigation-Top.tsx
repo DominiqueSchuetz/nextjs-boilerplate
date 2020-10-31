@@ -120,7 +120,7 @@ export default function PrimarySearchAppBar(): JSX.Element {
     const handleSignOutAndMenuClose = () => {
         setAnchorEl(null);
         signout();
-        toast.success('Du bist erfolgreich ausgeloggt');
+        toast.success('You are successfully logged out');
         router.push('/signin');
 
         handleMobileMenuClose();

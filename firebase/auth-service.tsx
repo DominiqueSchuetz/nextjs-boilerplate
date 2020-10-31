@@ -3,31 +3,22 @@ import { parse } from 'query-string';
 import { auth, firebase } from './';
 import { useRouter, Router } from 'next/router';
 import { fireEvent } from '../utils/test-utils';
+import { AuthType } from '../types';
+import { ProvideAuthContext } from '../lib/ProvideAuthContext';
 
-type AuthType = {
-    userId: string;
-    user: firebase.User;
-    signin: (email: string, password: string) => Promise<firebase.User | firebase.FirebaseError>;
-    signup: (email: string, password: string) => Promise<firebase.User | firebase.FirebaseError>;
-    signout: () => Promise<void | firebase.FirebaseError>;
-    sendPasswordResetEmail: (email: string) => Promise<boolean>;
-    confirmPasswordReset: (password: string, code: string) => Promise<boolean>;
-    deleteUser: () => Promise<void>;
-};
-
-const authContext = createContext<Partial<AuthType>>({});
+//  const authContext = createContext<Partial<AuthType>>({});
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const ProvideAuth = ({ children }): JSX.Element => {
-    const auth = useProvideAuth();
-    return <authContext.Provider value={auth}>{children}</authContext.Provider>;
-};
+// export const ProvideAuth = ({ children }): JSX.Element => {
+//     const auth = useProvideAuth();
+//     return <authContext.Provider value={auth}>{children}</authContext.Provider>;
+// };
 
 export const useAuth = (): Partial<AuthType> => {
-    return useContext(authContext);
+    return useContext(ProvideAuthContext);
 };
 
-const useProvideAuth = () => {
+export const useProvideAuth = () => {
     const [user, setUser] = useState<firebase.User | null | undefined>(null);
     const router = useRouter();
 
@@ -86,6 +77,8 @@ const useProvideAuth = () => {
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged((user) => {
             if (user) {
+                console.log(user);
+
                 setUser(user);
             } else {
                 setUser(null);
