@@ -77,8 +77,6 @@ export const useProvideAuth = () => {
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged((user) => {
             if (user) {
-                console.log(user);
-
                 setUser(user);
             } else {
                 setUser(null);

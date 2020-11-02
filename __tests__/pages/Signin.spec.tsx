@@ -13,7 +13,7 @@ const todos: Todotype[] = [
     { id: '567', title: 'wash dishes', completed: false },
 ];
 
-describe('Testing of Todos Page', () => {
+describe('Testing of Signin Page', () => {
     afterEach(() => {
         cleanup();
         jest.restoreAllMocks();
