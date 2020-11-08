@@ -16,10 +16,10 @@ import { makeStyles } from '@material-ui/core/styles';
 import { useRouter } from 'next/router';
 import firebase from 'firebase/app';
 
-import { errorMessages, validations } from '../utils';
+import { validations, errorMessages } from '@/utils/index';
 import { useAuth } from '../firebase/auth-service';
-import { initialState, loginReducer } from '../store/loginReducer';
-import { ERROR_ACTION, SUCCESS_ACTION, LOGIN_ACTION, LOGOUT_ACTION, SIGN_IN_MESSAGES } from '../store/action.types';
+import { initialState, loginReducer } from '@/store/loginReducer';
+import { ERROR_ACTION, SUCCESS_ACTION, LOGIN_ACTION, LOGOUT_ACTION, SIGN_IN_MESSAGES } from '@/store/action.types';
 
 function Copyright() {
     return (

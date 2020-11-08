@@ -1,10 +1,10 @@
 import React from 'react';
 
-import { render } from '../../utils/test-utils';
-import { Todos as Todotype } from '../../lib/TodosContext';
+import { render } from '@/utils/test-utils';
+import { Todos as Todotype } from '@/lib/TodosContext';
 import { fireEvent, cleanup, waitFor } from '@testing-library/react';
 
-import Todos from '../../pages/todos';
+import Todos from '@/pages/todos';
 import firebase from 'firebase/app';
 
 const todos: Todotype[] = [

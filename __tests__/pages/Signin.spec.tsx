@@ -1,9 +1,9 @@
 import React from 'react';
 
-import { render } from '../../utils/test-utils';
+import { render } from '@/utils/test-utils';
 import { fireEvent, cleanup } from '@testing-library/react';
 
-import SignIn from '../../pages/signin';
+import SignIn from '@/pages/signin';
 import firebase from 'firebase/app';
 import { useRouter } from 'next/router';
 

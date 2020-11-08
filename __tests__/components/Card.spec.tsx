@@ -1,10 +1,10 @@
 import React from 'react';
 
-import { render } from '../../utils/test-utils';
-import { Todos } from '../../lib/TodosContext';
-import { Status } from '../../types';
+import { render } from '@/utils/test-utils';
+import { Todos } from '@/lib/TodosContext';
+import { Status } from '@/types/index';
 
-import Card from '../../components/Card';
+import Card from '@/components/Card';
 
 describe('Card', () => {
     const todos: Todos = { id: '1', title: 'New title', status: Status[1] };

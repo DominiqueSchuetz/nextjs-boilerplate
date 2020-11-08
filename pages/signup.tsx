@@ -13,11 +13,11 @@ import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import firebase from 'firebase/app';
 
-import { initialState, signupReducer } from '../store/signupReducer';
-import { SIGNUP_ACTION, SUCCESS_ACTION, ERROR_ACTION, SIGN_UP_MESSAGES } from '../store/action.types';
+import { initialState, signupReducer } from '@/store/signupReducer';
+import { SIGNUP_ACTION, SUCCESS_ACTION, ERROR_ACTION, SIGN_UP_MESSAGES } from '@/store/action.types';
 import { useAuth } from '../firebase/auth-service';
 import { useRouter } from 'next/router';
-import { errorMessages, validations } from '../utils';
+import { validations, errorMessages } from '@/utils/index';
 
 function Copyright() {
     return (

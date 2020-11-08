@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { render } from '../../utils/test-utils';
-import Rating from '../../components/Rating';
+import { render } from '@/utils/test-utils';
+import Rating from '@/components/Rating';
 import { fireEvent } from '@testing-library/react';
 
 describe('Rating', () => {

@@ -1,7 +1,6 @@
 import Router from 'next/router';
-import { NextPageContext } from 'next';
 
-export default async (context: any, target: string): Promise<any> => {
+export const redirect = async (context: any, target: string): Promise<any> => {
     if (context.res) {
         // server
         context.res.writeHead(303, { Location: target });

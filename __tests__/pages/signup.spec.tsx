@@ -3,7 +3,7 @@ import React from 'react';
 import { render } from '../../utils/test-utils';
 import { fireEvent, cleanup } from '@testing-library/react';
 
-import SignUp from '../../pages/signup';
+import SignUp from '@/pages/signup';
 import firebase from 'firebase/app';
 
 describe('Testing of Signup Page', () => {

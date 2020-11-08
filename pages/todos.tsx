@@ -1,20 +1,19 @@
 /* eslint-disable react/prop-types */
 import React, { useState, useEffect, useMemo } from 'react';
 import { NextPage } from 'next';
-import BottomNav from '../components/BottomNav';
+import BottomNav from '@/components/BottomNav';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import PrimarySearchAppBar from '../components/Navigation-Top';
-import Card from '../components/Card';
+import PrimarySearchAppBar from '@/components/Navigation-Top';
+import Card from '@/components/Card';
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import TextField from '@material-ui/core/TextField';
-import * as fetch from 'node-fetch';
 import { Typography } from '@material-ui/core';
-import { withFirebaseAuthentication } from '../utils/withFirebaseAuthentication';
+import { withFirebaseAuthentication } from '@/utils/withFirebaseAuthentication';
 
-import { TodosContext, Todos as TodoType } from '../lib/TodosContext';
-import { TodosFilterContext } from '../lib/TodosFilterContext';
-import { FilterBy, Status } from '../types';
+import { TodosContext, Todos as TodoType } from '@/lib/TodosContext';
+import { TodosFilterContext } from '@/lib/TodosFilterContext';
+import { FilterBy, Status } from '@/types/index';
 
 type Todos = {
     readonly id: string;
