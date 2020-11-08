@@ -18,12 +18,11 @@ const sendEmailVerification = jest.fn(() => {
 });
 
 const sendPasswordResetEmail = jest.fn(() => Promise.resolve());
-const createUserWithEmailAndPassword = jest.fn(() => {
-    return Promise.resolve('result of createUserWithEmailAndPassword');
-});
+
+const createUserWithEmailAndPassword = jest.fn(() => Promise.resolve('result of createUserWithEmailAndPassword'));
 
 const signInWithEmailAndPassword = jest.fn(() => {
-    return Promise.resolve('result of signInWithEmailAndPassword');
+    return Promise.resolve({ email: 'test@test.de', emailVerified: true, uid: '123456789' });
 });
 
 const signInWithRedirect = jest.fn(() => {
@@ -36,7 +35,6 @@ const initializeAppMock = jest.spyOn(firebase, 'initializeApp').mockImplementati
         auth: () => {
             return {
                 createUserWithEmailAndPassword,
-                signInWithEmailAndPassword,
                 currentUser: {
                     sendEmailVerification,
                 },
@@ -56,6 +54,8 @@ const authMock = jest.spyOn(firebase, 'auth').mockImplementation(() => {
         },
         getRedirectResult,
         sendPasswordResetEmail,
+        signInWithEmailAndPassword,
+        createUserWithEmailAndPassword,
     };
 });
 
@@ -68,4 +68,4 @@ firebase.auth.GoogleAuthProvider = jest.fn(() => {
 firebase.initializeApp = initializeAppMock;
 firebase.auth = authMock;
 
-module.exports = firebase;
+export default firebase;

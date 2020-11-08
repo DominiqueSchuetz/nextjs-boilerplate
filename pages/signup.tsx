@@ -11,6 +11,7 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
+import firebase from 'firebase/app';
 
 import { initialState, signupReducer } from '../store/signupReducer';
 import { SIGNUP_ACTION, SUCCESS_ACTION, ERROR_ACTION, SIGN_UP_MESSAGES } from '../store/action.types';

@@ -5,7 +5,7 @@ import { Todos as Todotype } from '../../lib/TodosContext';
 import { fireEvent, cleanup, waitFor } from '@testing-library/react';
 
 import Todos from '../../pages/todos';
-import * as firebase from 'firebase/app';
+import firebase from 'firebase/app';
 
 const todos: Todotype[] = [
     { id: '123', title: 'buy milk', completed: false },

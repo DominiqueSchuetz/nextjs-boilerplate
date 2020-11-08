@@ -1,17 +1,16 @@
 import React from 'react';
 
 import { render } from '../../utils/test-utils';
-import { Todos as Todotype } from '../../lib/TodosContext';
-import { fireEvent, cleanup, waitFor } from '@testing-library/react';
+import { fireEvent, cleanup } from '@testing-library/react';
 
-import Todos from '../../pages/todos';
-import * as firebase from 'firebase/app';
+import SignIn from '../../pages/signin';
+import firebase from 'firebase/app';
+import { useRouter } from 'next/router';
 
-const todos: Todotype[] = [
-    { id: '123', title: 'buy milk', completed: false },
-    { id: '234', title: 'drink coffee', completed: true },
-    { id: '567', title: 'wash dishes', completed: false },
-];
+jest.mock('next/router', () => ({
+    __esModule: true,
+    useRouter: jest.fn(),
+}));
 
 describe('Testing of Signin Page', () => {
     afterEach(() => {
@@ -19,100 +18,62 @@ describe('Testing of Signin Page', () => {
         jest.restoreAllMocks();
     });
 
-    test('should have text todo app', async () => {
-        const { getByText, findByText } = render(<Todos todos={todos} />, {});
+    test('should have text sign in', () => {
+        const { getAllByText } = render(<SignIn />, {});
+        getAllByText('Sign in', { selector: 'h1', exact: false });
+    });
 
-        expect(firebase.initializeApp).toHaveBeenCalledTimes(1);
-        expect(firebase.auth).toHaveBeenCalledTimes(1);
-        expect(firebase.auth().currentUser).toStrictEqual({
+    test('should appear with an error if a invalid email has been sent', async () => {
+        const { getByTestId, getByText, findByText } = render(<SignIn />, {});
+        const emailInput = getByTestId('Email Address').querySelector('input');
+        fireEvent.change(emailInput, { target: { value: 'test.de' } });
+        fireEvent.click(getByText('Sign In'));
+        expect(await findByText('this is not a valid email address')).toBeVisible();
+    });
+
+    test('should appear with an error if a invalid password has been sent', async () => {
+        const { getByTestId, getByText, findByText } = render(<SignIn />, {});
+        const passwordInput = getByTestId('Password').querySelector('input');
+        fireEvent.change(passwordInput, { target: { value: '1234' } });
+        fireEvent.click(getByText('Sign In'));
+        expect(await findByText('for a valid Password we need at least 8 Charakters')).toBeVisible();
+    });
+
+    test('should appear with an error if input fields are empty', async () => {
+        const { getByTestId, getByText, findByText } = render(<SignIn />, {});
+        fireEvent.click(getByText('Sign In'));
+        expect(await findByText('email field is required')).toBeVisible();
+        expect(await findByText('password field is required')).toBeVisible();
+        expect(getByTestId('button').closest('button')).toBeDisabled();
+    });
+
+    test('should sign in test user to firebase and redirect to todos pages', async () => {
+        const { getByTestId, getByText } = render(<SignIn />, {});
+        const email = 'test-user@test.com';
+        const password = '123456789';
+
+        const mockRouter = {
+            push: jest.fn(() => Promise.resolve(true)), // the component uses `router.push` only
+        };
+        (useRouter as jest.Mock<any>).mockReturnValue(mockRouter);
+
+        const emailInput = getByTestId('Email Address').querySelector('input');
+        const passwordInput = getByTestId('Password').querySelector('input');
+        fireEvent.change(emailInput, { target: { value: email } });
+        fireEvent.change(passwordInput, { target: { value: password } });
+        fireEvent.click(getByText('Sign In'));
+
+        const result = firebase.auth().signInWithEmailAndPassword(email, password);
+
+        expect(firebase.auth().signInWithEmailAndPassword).toHaveBeenCalledTimes(1);
+        await expect(result).resolves.toEqual({
             email: 'test@test.de',
             uid: '123456789',
             emailVerified: true,
         });
+        const { push } = useRouter();
+        push('/todos');
 
-        expect(getByText('Todo App')).not.toBeNull();
-        await findByText('wash dishes');
-    });
-
-    test('should have an input filed with label text', () => {
-        const { getByLabelText } = render(<Todos todos={todos}></Todos>, {});
-        getByLabelText('What else to do?');
-    });
-
-    test('should add a new todo card', async () => {
-        const { findByTestId, getByText } = render(<Todos todos={todos}></Todos>, {});
-        const inputField = await findByTestId('inputfield');
-
-        fireEvent.change(inputField, { target: { value: 'A new todo' } });
-        fireEvent.keyPress(inputField, { key: 'Enter', keyCode: 13 });
-
-        await waitFor(() => {
-            getByText(/a nEw todo/i);
-        });
-    });
-
-    test('should delete a todo card', () => {
-        const { getAllByText, getByText, queryByText } = render(<Todos todos={todos}></Todos>, {});
-        expect(getByText('buy milk')).not.toBeNull();
-        const deleteButton = getAllByText('Delete')[0];
-        fireEvent.click(deleteButton);
-
-        expect(queryByText('buy milk')).toBeNull();
-    });
-
-    xtest('should complete a todo card', () => {
-        const { getAllByText, getAllByTestId } = render(<Todos todos={todos}></Todos>, {});
-        const allTodos = getAllByTestId('todo-status');
-        let openTodos = allTodos.filter((e) => e.textContent === 'Open');
-
-        expect(getAllByText('Revert').length).toBe(1);
-        expect(openTodos.length).toBe(2);
-
-        const doneButton = getAllByText('Done')[0];
-        fireEvent.click(doneButton);
-
-        openTodos = allTodos.filter((e) => e.textContent === 'Open');
-        expect(openTodos.length).toBe(1);
-
-        expect(getAllByText('Revert').length).toBe(2);
-    });
-
-    test('should filter completed todos', async () => {
-        const { getAllByTestId, getByTestId } = render(<Todos todos={todos}></Todos>, {});
-
-        expect(getAllByTestId('todo-card').length).toBe(3);
-        const filterButton = getByTestId('filter-button-completed');
-
-        fireEvent.click(filterButton);
-
-        const findCompleted = getAllByTestId('todo-card');
-        expect(findCompleted.length).toBe(1);
-    });
-
-    test('should filter open todos', async () => {
-        const { getAllByTestId, getByTestId } = render(<Todos todos={todos}></Todos>, {});
-        expect(getAllByTestId('todo-card').length).toBe(3);
-        const filterButton = getByTestId('filter-button-open');
-        fireEvent.click(filterButton);
-
-        expect(getAllByTestId('todo-card').length).toBe(2);
-    });
-
-    test('should filter all todos', () => {
-        const { getAllByTestId, getByTestId } = render(<Todos todos={todos}></Todos>, {});
-        expect(getAllByTestId('todo-card').length).toBe(3);
-        const filterButton = getByTestId('filter-button-all');
-        fireEvent.click(filterButton);
-
-        expect(getAllByTestId('todo-card').length).toBe(3);
-    });
-
-    test('should delete all todos', () => {
-        const { getAllByTestId, getByTestId, queryAllByTestId } = render(<Todos todos={todos}></Todos>, {});
-        expect(getAllByTestId('todo-card').length).toBe(3);
-        const filterButton = getByTestId('filter-button-delete-all');
-        fireEvent.click(filterButton);
-
-        expect(queryAllByTestId('todo-card').length).toBe(0);
+        expect(mockRouter.push).toHaveBeenCalledWith('/todos');
     });
 });

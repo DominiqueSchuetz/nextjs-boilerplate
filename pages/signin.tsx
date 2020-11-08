@@ -14,6 +14,7 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import { useRouter } from 'next/router';
+import firebase from 'firebase/app';
 
 import { errorMessages, validations } from '../utils';
 import { useAuth } from '../firebase/auth-service';
@@ -60,7 +61,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const SignInSide = (): JSX.Element => {
+const SignIn = (): JSX.Element => {
     const classes = useStyles();
     const { signin } = useAuth();
     const router = useRouter();
@@ -192,4 +193,4 @@ const SignInSide = (): JSX.Element => {
     );
 };
 
-export default SignInSide;
+export default SignIn;
