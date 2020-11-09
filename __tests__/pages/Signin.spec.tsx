@@ -1,18 +1,32 @@
 import React from 'react';
+import { useRouter } from 'next/router';
+import { useAuth } from '../../firebase/auth-service';
 
-import { render } from '@/utils/test-utils';
-import { fireEvent, cleanup } from '@testing-library/react';
+import { render, act, fireEvent, cleanup } from '@/utils/test-utils';
 
 import SignIn from '@/pages/signin';
-import firebase from 'firebase/app';
-import { useRouter } from 'next/router';
 
-jest.mock('next/router', () => ({
-    __esModule: true,
-    useRouter: jest.fn(),
-}));
+jest.mock('next/router');
+jest.mock('../../firebase/auth-service');
 
 describe('Testing of Signin Page', () => {
+    let expectedRouterPush, expectedEmail, expectedPassword, expectedSignIn;
+
+    beforeEach(() => {
+        expectedRouterPush = jest.fn();
+        expectedSignIn = jest.fn();
+        (expectedSignIn as jest.Mock).mockResolvedValue('');
+        expectedEmail = 'test-user@test.com';
+        expectedPassword = '123456789';
+
+        (useRouter as jest.Mock).mockReturnValue({ push: expectedRouterPush });
+
+        (useAuth as jest.Mock).mockReturnValue({
+            signin: expectedSignIn,
+            userId: 123,
+        });
+    });
+
     afterEach(() => {
         cleanup();
         jest.restoreAllMocks();
@@ -49,31 +63,20 @@ describe('Testing of Signin Page', () => {
 
     test('should sign in test user to firebase and redirect to todos pages', async () => {
         const { getByTestId, getByText } = render(<SignIn />, {});
-        const email = 'test-user@test.com';
-        const password = '123456789';
-
-        const mockRouter = {
-            push: jest.fn(() => Promise.resolve(true)), // the component uses `router.push` only
-        };
-        (useRouter as jest.Mock<any>).mockReturnValue(mockRouter);
-
         const emailInput = getByTestId('Email Address').querySelector('input');
         const passwordInput = getByTestId('Password').querySelector('input');
-        fireEvent.change(emailInput, { target: { value: email } });
-        fireEvent.change(passwordInput, { target: { value: password } });
-        fireEvent.click(getByText('Sign In'));
+        const signinButton = getByText('Sign In');
 
-        const result = firebase.auth().signInWithEmailAndPassword(email, password);
-
-        expect(firebase.auth().signInWithEmailAndPassword).toHaveBeenCalledTimes(1);
-        await expect(result).resolves.toEqual({
-            email: 'test@test.de',
-            uid: '123456789',
-            emailVerified: true,
+        await act(async () => {
+            fireEvent.change(emailInput, { target: { value: expectedEmail } });
+            fireEvent.change(passwordInput, { target: { value: expectedPassword } });
+            fireEvent.submit(signinButton);
         });
-        const { push } = useRouter();
-        push('/todos');
 
-        expect(mockRouter.push).toHaveBeenCalledWith('/todos');
+        expect(expectedSignIn).toHaveBeenCalledTimes(1);
+        expect(expectedSignIn).toHaveBeenCalledWith(expectedEmail, expectedPassword);
+
+        expect(expectedRouterPush).toHaveBeenCalledTimes(1);
+        expect(expectedRouterPush).toHaveBeenCalledWith('/todos');
     });
 });

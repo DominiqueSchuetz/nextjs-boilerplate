@@ -77,7 +77,6 @@ const SignIn = (): JSX.Element => {
                 userFormData.email,
                 userFormData.password,
             );
-
             if (response instanceof Error) {
                 dispatch({ type: ERROR_ACTION, message: ((response as unknown) as firebase.FirebaseError).message });
                 return;
